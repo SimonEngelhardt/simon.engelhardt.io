@@ -161,39 +161,17 @@ resumeApp.controller('SkillsCtrl', ['$scope', 'sheets', 'constants', 'scroll', '
 }]);
 
 resumeApp.factory('sheets', ['$http', '$location', function($http, $location) {
-  var sheetUrls = {
-        projects:   'https://spreadsheets.google.com/feeds/list/0ApJXKMOVLglTdE04c2Y0N192VWJQSlVzTWpicDBqbEE/1/public/values?alt=json',
-        experience: 'https://spreadsheets.google.com/feeds/list/0ApJXKMOVLglTdE04c2Y0N192VWJQSlVzTWpicDBqbEE/3/public/values?alt=json',
-        education:  'https://spreadsheets.google.com/feeds/list/0ApJXKMOVLglTdE04c2Y0N192VWJQSlVzTWpicDBqbEE/4/public/values?alt=json',
-        skills:  'https://spreadsheets.google.com/feeds/list/0ApJXKMOVLglTdE04c2Y0N192VWJQSlVzTWpicDBqbEE/2/public/values?alt=json'
-      },
-      keyPrefix = 'gsx$',
-      valuePropertyName = '$t';
-
-  // Simple mapping of all properties from Google spreadsheet columns (in format such as entry.gsx$columnname.$t)
+  // Simple mapping of all properties from Google spreadsheet columns
   function mapSheet(data) {
-    var objects = data.feed.entry.map(function(entry) {
-      var object = {};
+    const [keys, ...values] = data.values;
 
-      for (var key in entry) {
-        if (key.indexOf(keyPrefix) === 0) {
-          var value = entry[key][valuePropertyName];
-
-          if (value.indexOf('\n') !== -1)
-            value = value.split('\n').filter(function(s) { return s.length > 0; });
-          else
-            value = value.toString();
-
-          object[key.substring(keyPrefix.length)] = value;
-        }
-      }
-      return object;
-    });
+    const objects = values.map(value => Object.fromEntries(value.map((v, i) => [keys[i].toLowerCase(), v])));
 
     return objects;
   }
 
-  function getSheet(url) {
+  function getSheet(sheet) {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/1PtKGUKUg3-9EQxkg4oVuZhPv90v82yIkw0ng-NfGedk/values/${sheet}?key=AIzaSyDamO9s2ehd1rqiMa2hRaAzEauICbXPZ08`
     return $http.get(url)
       .then(function(response) {
         return mapSheet(response.data);
@@ -202,16 +180,16 @@ resumeApp.factory('sheets', ['$http', '$location', function($http, $location) {
 
   return {
     getProjects: function() {
-      return getSheet(sheetUrls.projects);
+      return getSheet('Projects');
     },
     getEducations: function() {
-      return getSheet(sheetUrls.education);
+      return getSheet('Education');
     },
     getExperiences: function() {
-      return getSheet(sheetUrls.experience);
+      return getSheet('Experience');
     },
     getSkills: function() {
-      return getSheet(sheetUrls.skills);
+      return getSheet('Skills');
     }
   };
 }]);
