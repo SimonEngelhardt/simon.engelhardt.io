@@ -1,0 +1,31 @@
+<h3>{{experience.title}} <small><a href="{{experience.url}}" target="_blank" title="{{experience.urlnote}}">{{experience.company}}</a></small></h3>
+<div class="timeline" ng-show="experience.years">
+  <span ng-repeat="year in allYears" class="year" ng-style="{width: 100/allYears.length + '%'}" ng-class="{active: experience.years.indexOf(year) !== -1, first: experience.years.indexOf(year) === 0, last: experience.years.indexOf(year) === experience.years.length - 1}">{{year}}</span>
+</div>
+<p class="details">
+  {{experience.start.toDate() | date:experience.dateFormat}} – {{experience.current ? 'Present' : experience.end.toDate() | date:experience.dateFormat}}
+  (<ng-pluralize
+    count="experience.duration.years()"
+    when="{'0': '',
+           'one': '1 year',
+           'other': '{} years'}">
+  </ng-pluralize><span
+    ng-if="experience.duration.years() > 0 && experience.duration.months() > 0"> </span><ng-pluralize
+    count="experience.duration.months()"
+    when="{'0': '',
+           'one': '1 month',
+           'other': '{} months'}">
+  </ng-pluralize>)
+  <br/>
+  {{experience.location}}
+</p>
+<p>
+  {{experience.description}}
+</p>
+<div ng-if="experience.extendeddescription" class="extended-content" ng-class="{'collapsed': !experience.extendedDescriptionVisible}">
+  <a ng-click="experience.extendedDescriptionVisible = !experience.extendedDescriptionVisible" trigger-scroll-onclick class="expand-button">
+    <i class="fa" ng-class="{'fa-angle-right': !experience.extendedDescriptionVisible, 'fa-angle-down': experience.extendedDescriptionVisible}"></i>
+    Further description
+  </a>
+  <p ng-show="experience.extendedDescriptionVisible">{{experience.extendeddescription}}</p>
+</div>
